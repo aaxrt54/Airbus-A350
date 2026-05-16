@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Airbus A350</title>
+  <style>
+    :root {
+      --bg: #07131f;
+      --bg-soft: #102336;
+      --panel: rgba(9, 26, 41, 0.86);
+      --panel-strong: #10273c;
+      --text: #ecf6ff;
+      --muted: #b2c7d8;
+      --accent: #5ac8fa;
+      --accent-strong: #0ea5e9;
+      --border: rgba(255, 255, 255, 0.1);
+      --shadow: 0 20px 45px rgba(0, 0, 0, 0.28);
+      --hero: linear-gradient(135deg, rgba(14, 165, 233, 0.28), rgba(37, 99, 235, 0.1));
+    }
+
+    body.light {
+      --bg: #eef5fb;
+      --bg-soft: #dce9f6;
+      --panel: rgba(255, 255, 255, 0.9);
+      --panel-strong: #ffffff;
+      --text: #102033;
+      --muted: #49627d;
+      --accent: #0284c7;
+      --accent-strong: #0369a1;
+      --border: rgba(16, 32, 51, 0.08);
+      --shadow: 0 20px 45px rgba(12, 44, 74, 0.12);
+      --hero: linear-gradient(135deg, rgba(2, 132, 199, 0.18), rgba(255, 255, 255, 0.65));
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(90, 200, 250, 0.18), transparent 32%),
+        radial-gradient(circle at top right, rgba(14, 165, 233, 0.14), transparent 25%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
+      min-height: 100vh;
+      transition: background 0.35s ease, color 0.35s ease;
+    }
+
+    .shell {
+      width: min(1120px, calc(100% - 32px));
+      margin: 24px auto;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    header {
+      padding: 28px 28px 18px;
+      background: var(--hero);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .title-block h1 {
+      margin: 0;
+      font-size: clamp(2.1rem, 4vw, 3.4rem);
+      letter-spacing: 0.04em;
+    }
+
+    .title-block p {
+      margin: 10px 0 0;
+      max-width: 700px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 1rem;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(14, 165, 233, 0.22);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover,
+    button:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 30px rgba(14, 165, 233, 0.28);
+    }
+
+    nav {
+      display: flex;
+      gap: 12px;
+      padding: 18px 28px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .nav-link {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: none;
+      padding: 10px 18px;
+    }
+
+    .nav-link.active-nav {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      border-color: transparent;
+      color: #ffffff;
+    }
+
+    main {
+      padding: 0 28px 28px;
+    }
+
+    section {
+      display: none;
+      padding-top: 28px;
+      animation: fadeIn 0.35s ease;
+    }
+
+    section.active {
+      display: block;
+    }
+
+    .hero-card,
+    .info-card,
+    .part-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 24px;
+      padding: 26px;
+      align-items: center;
+    }
+
+    .hero-copy h2,
+    #partes h2,
+    #info h2 {
+      margin-top: 0;
+      font-size: clamp(1.7rem, 3vw, 2.4rem);
+    }
+
+    .hero-copy p,
+    .part-card p,
+    .info-card li {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .stat {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.3rem;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .aircraft-visual {
+      min-height: 280px;
+      border-radius: 22px;
+      background:
+        linear-gradient(180deg, rgba(90, 200, 250, 0.25), rgba(9, 26, 41, 0.1)),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.02));
+      padding: 16px;
+    }
+
+    .aircraft-visual iframe,
+    .part-figure img {
+      width: 100%;
+      display: block;
+      border: 0;
+      border-radius: 16px;
+    }
+
+    .aircraft-visual iframe {
+      min-height: 320px;
+      background: #091a29;
+    }
+
+    .model-credit {
+      margin: 10px 4px 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .model-credit a {
+      color: var(--accent);
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .model-credit a:hover,
+    .model-credit a:focus-visible {
+      text-decoration: underline;
+    }
+
+    .part-figure img {
+      height: 100%;
+      min-height: 220px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .section-intro {
+      margin-bottom: 20px;
+      color: var(--muted);
+      max-width: 760px;
+      line-height: 1.7;
+    }
+
+    .parts-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .part-card {
+      display: grid;
+      grid-template-columns: 1.2fr minmax(240px, 320px);
+      align-items: stretch;
+    }
+
+    .part-copy {
+      padding: 24px;
+    }
+
+    .part-copy h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 1.45rem;
+    }
+
+    .part-copy span {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(90, 200, 250, 0.12);
+      color: var(--accent);
+      font-size: 0.86rem;
+      font-weight: bold;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .part-figure {
+      border-left: 1px solid var(--border);
+      background:
+        linear-gradient(135deg, rgba(90, 200, 250, 0.15), rgba(255, 255, 255, 0.03)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent);
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .info-card {
+      padding: 24px 24px 24px 34px;
+    }
+
+    .info-card ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .info-card p {
+      color: var(--muted);
+      line-height: 1.8;
+      margin: 0 0 16px;
+    }
+
+    .info-card h3 {
+      margin: 26px 0 14px;
+      font-size: 1.3rem;
+    }
+
+    .history-highlight {
+      margin: 26px 0;
+      padding: 18px;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(135deg, rgba(90, 200, 250, 0.16), rgba(255, 255, 255, 0.05)),
+        rgba(255, 255, 255, 0.03);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .history-highlight span {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(90, 200, 250, 0.14);
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: bold;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .history-highlight h3 {
+      margin: 0 0 12px;
+    }
+
+    .history-highlight img {
+      width: 100%;
+      border-radius: 18px;
+      display: block;
+      margin-top: 14px;
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    .info-card li + li {
+      margin-top: 10px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 18px 24px 28px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 860px) {
+      .hero-card,
+      .part-card {
+        grid-template-columns: 1fr;
+      }
+
+      .part-figure {
+        border-left: none;
+        border-top: 1px solid var(--border);
+      }
+
+      .hero-stats {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .shell {
+        width: min(100% - 16px, 100%);
+        margin: 8px auto;
+        border-radius: 18px;
+      }
+
+      header,
+      nav,
+      main {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .hero-card,
+      .part-copy,
+      .info-card {
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="header-bar">
+        <div class="title-block">
+          <h1>Airbus A350</h1>
+          <p>Una vista clara y visual de uno de los aviones comerciales mas modernos del mundo, con sus partes principales y su funcion dentro del vuelo.</p>
+        </div>
+        <button type="button" onclick="toggleTheme()">Modo claro / oscuro</button>
+      </div>
+    </header>
+
+    <nav aria-label="Secciones del sitio">
+      <button type="button" class="nav-link active-nav" data-section="inicio" onclick="showSection('inicio', this)">Inicio</button>
+      <button type="button" class="nav-link" data-section="partes" onclick="showSection('partes', this)">Partes del avion</button>
+      <button type="button" class="nav-link" data-section="info" onclick="showSection('info', this)">Historia</button>
+    </nav>
+
+    <main>
+      <section id="inicio" class="active">
+        <div class="hero-card">
+          <div class="hero-copy">
+            <h2>Introduccion</h2>
+            <p>El Airbus A350 es un avion de fuselaje ancho disenado para vuelos de larga distancia. Es uno de los modelos mas modernos del mundo y destaca por su eficiencia, comodidad y tecnologia avanzada.</p>
+            <p>Puede transportar entre 280 y mas de 350 pasajeros dependiendo de la version, y esta disenado para recorrer distancias de hasta 15,000 kilometros sin escalas.</p>
+            <p>Esta fabricado en gran parte con materiales compuestos como la fibra de carbono, lo que lo hace mas ligero, resistente y eficiente en el consumo de combustible.</p>
+            <div class="hero-stats">
+              <div class="stat">
+                <strong>15,000 km</strong>
+                <span>Alcance maximo</span>
+              </div>
+              <div class="stat">
+                <strong>300-410</strong>
+                <span>Pasajeros</span>
+              </div>
+              <div class="stat">
+                <strong>2</strong>
+                <span>Motores avanzados</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="aircraft-visual" aria-hidden="true">
+            <div class="sketchfab-embed-wrapper">
+              <iframe
+                title="Airbus A350 900"
+                allowfullscreen
+                mozallowfullscreen="true"
+                webkitallowfullscreen="true"
+                allow="autoplay; fullscreen; xr-spatial-tracking"
+                xr-spatial-tracking
+                execution-while-out-of-viewport
+                execution-while-not-rendered
+                web-share
+                src="https://sketchfab.com/models/0703224a1a7e497eaa2a860e1d3b1774/embed?autostart=1">
+              </iframe>
+              <p class="model-credit">
+                <a href="https://sketchfab.com/3d-models/airbus-a350-900-0703224a1a7e497eaa2a860e1d3b1774?utm_medium=embed&utm_campaign=share-popup&utm_content=0703224a1a7e497eaa2a860e1d3b1774" target="_blank" rel="nofollow">Airbus A350 900</a>
+                by
+                <a href="https://sketchfab.com/SQUIR3D?utm_medium=embed&utm_campaign=share-popup&utm_content=0703224a1a7e497eaa2a860e1d3b1774" target="_blank" rel="nofollow">SQUIR3D</a>
+                on
+                <a href="https://sketchfab.com?utm_medium=embed&utm_campaign=share-popup&utm_content=0703224a1a7e497eaa2a860e1d3b1774" target="_blank" rel="nofollow">Sketchfab</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="partes">
+        <h2>Partes del avion y como funcionan</h2>
+        <p class="section-intro">Cada tarjeta muestra la parte principal del Airbus A350 y, a la derecha, una ilustracion que ayuda a identificar su ubicacion o funcion. En celular las imagenes bajan debajo del texto para mantener una lectura comoda.</p>
+
+        <div class="parts-grid">
+          <article class="part-card">
+            <div class="part-copy">
+              <span>Estructura principal</span>
+              <h3>Fuselaje</h3>
+              <p>El fuselaje es la estructura principal del avion, es decir, el cuerpo donde se encuentran los pasajeros, la tripulacion y la carga.</p>
+              <p>En el Airbus A350 esta disenado con materiales modernos como la fibra de carbono, lo que lo hace mas ligero y resistente que los aviones antiguos.</p>
+              <p>Ademas, cumple una funcion muy importante: mantener la presion del aire en el interior para que las personas puedan respirar normalmente a grandes alturas. Tambien ayuda a proteger a los pasajeros de las condiciones externas, como el frio extremo y la baja presion.</p>
+            </div>
+            <div class="part-figure">
+              <img src="https://actualidadaeroespacial.com/wp-content/uploads/2021/07/Airbus-inicia-el-montaje-del-primer-fuselaje-delantero-de-su-A321XLR-130721.jpg" alt="Fuselaje del Airbus">
+            </div>
+          </article>
+
+          <article class="part-card">
+            <div class="part-copy">
+              <span>Aerodinamica</span>
+              <h3>Alas</h3>
+              <p>Las alas son fundamentales para que el avion pueda volar, ya que generan la sustentacion.</p>
+              <p>Esto sucede porque su forma hace que el aire fluya mas rapido por la parte superior que por la inferior, creando una diferencia de presion que levanta el avion.</p>
+              <p>En el A350, las alas son largas, delgadas y ligeramente curvas, lo que mejora la eficiencia. Tambien son flexibles, lo que ayuda a soportar turbulencias y reduce el desgaste de la estructura.</p>
+            </div>
+            <div class="part-figure">
+              <img src="https://aviaciondigital.com/wp-content/uploads/2023/03/Lufthansa-A350-1000.jpg" alt="Alas del Airbus A350 en vuelo">
+            </div>
+          </article>
+
+          <article class="part-card">
+            <div class="part-copy">
+              <span>Propulsion</span>
+              <h3>Motores</h3>
+              <p>Los motores son los encargados de generar el empuje necesario para que el avion avance y pueda despegar.</p>
+              <p>El A350 utiliza motores muy avanzados que consumen menos combustible y producen menos emisiones contaminantes. Funcionan aspirando aire, comprimiendolo, mezclandolo con combustible y expulsandolo a gran velocidad hacia atras, lo que impulsa el avion hacia adelante.</p>
+              <p>Ademas, estos motores estan disenados para ser mas silenciosos, lo que mejora la experiencia tanto dentro como fuera del avion.</p>
+            </div>
+            <div class="part-figure">
+              <img src="https://fly-news.es/wp-content/uploads/Trent_A350_03.jpg" alt="Motores del Airbus A350">
+            </div>
+          </article>
+
+          <article class="part-card">
+            <div class="part-copy">
+              <span>Control</span>
+              <h3>Cabina de mando</h3>
+              <p>La cabina de mando es el lugar donde los pilotos controlan el avion.</p>
+              <p>En el A350, esta cabina cuenta con tecnologia muy avanzada, como pantallas digitales y sistemas automaticos que ayudan a controlar el vuelo. Este tipo de tecnologia se conoce como fly-by-wire, donde los controles electronicos reemplazan los sistemas mecanicos tradicionales.</p>
+              <p>Gracias a esto, el vuelo es mas preciso, seguro y eficiente, y los pilotos pueden tomar mejores decisiones en situaciones complejas.</p>
+            </div>
+            <div class="part-figure">
+              <img src="https://i0.wp.com/www.transponder1200.com/wp-content/uploads/2018/06/AIRBUS-A350-XWB-COCKPIT.jpg?resize=1280%2C720&ssl=1" alt="Cabina de mando del Airbus A350">
+            </div>
+          </article>
+
+          <article class="part-card">
+            <div class="part-copy">
+              <span>Despegue y aterrizaje</span>
+              <h3>Tren de aterrizaje</h3>
+              <p>El tren de aterrizaje permite que el avion despegue, aterrice y se desplace en tierra.</p>
+              <p>Esta compuesto por ruedas, amortiguadores y sistemas hidraulicos que absorben el impacto al aterrizar. En aviones grandes como el A350, el tren de aterrizaje es muy resistente debido al peso que debe soportar.</p>
+              <p>Durante el vuelo, se retrae hacia el interior del fuselaje para reducir la resistencia del aire y mejorar la eficiencia.</p>
+            </div>
+            <div class="part-figure">
+              <img src="https://p.turbosquid.com/ts-thumb/mF/k2IKiE/wlYbGQ1k/landing_gears_a350_001/jpg/1577042311/1920x1080/fit_q87/a5100a13c7ef3ea0a427c6e23f7f316f2142e9a4/landing_gears_a350_001.jpg" alt="Tren de aterrizaje del Airbus A350">
+            </div>
+          </article>
+
+          <article class="part-card">
+            <div class="part-copy">
+              <span>Estabilidad</span>
+              <h3>Cola o empenaje</h3>
+              <p>La cola o empenaje incluye los estabilizadores vertical y horizontal, piezas clave para mantener la estabilidad del avion durante el vuelo.</p>
+              <p>Estas superficies ayudan a controlar la direccion, la inclinacion y el equilibrio general de la aeronave, especialmente durante maniobras, despegues y aterrizajes.</p>
+              <p>En un avion moderno como el A350, el empenaje trabaja junto con los sistemas electronicos de control para ofrecer un vuelo mas seguro, preciso y estable.</p>
+            </div>
+            <div class="part-figure">
+              <img src="https://static.hosteltur.com/app/public/uploads/img/articles/2019/04/11/L_223153_iberia-a350hh.jpg" alt="Cola o empenaje del Airbus A350">
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="info">
+        <h2>Historia</h2>
+        <div class="info-card">
+          <p>El Airbus A350 es uno de los aviones mas avanzados de la aviacion moderna, desarrollado por la empresa europea Airbus como respuesta a la necesidad de aeronaves mas eficientes, comodas y ecologicas para vuelos de larga distancia.</p>
+          <p>Su origen se remonta a principios de los anos 2000, cuando Airbus comenzo a trabajar en un proyecto que pudiera competir directamente con el Boeing 787 Dreamliner, el cual destacaba por su uso de materiales modernos y menor consumo de combustible. Inicialmente, Airbus propuso una version mejorada de modelos anteriores, pero debido a la competencia y las exigencias del mercado, decidio redisenar completamente el proyecto, dando origen al A350 XWB, es decir, de fuselaje extra ancho.</p>
+          <p>El desarrollo del A350 represento un gran avance tecnologico, ya que mas del 50% de su estructura esta hecha de materiales compuestos como la fibra de carbono. Esto permitio reducir el peso del avion, aumentar su resistencia y mejorar significativamente su eficiencia. Ademas, se incorporaron sistemas digitales avanzados tanto en la cabina de mando como en los sistemas de control del avion, facilitando el trabajo de los pilotos y aumentando la seguridad.</p>
+          <p>Uno de los momentos mas importantes en la historia del A350 ocurrio en el ano 2013, cuando realizo su primer vuelo de prueba. Este evento marco el inicio de una serie de pruebas exhaustivas para asegurar que el avion cumpliera con todos los estandares internacionales de seguridad y rendimiento. Durante esta etapa, el A350 demostro ser un avion confiable, eficiente y capaz de realizar vuelos de larga duracion sin problemas.</p>
+          <p>Finalmente, en el ano 2015, el A350 entro en servicio comercial, siendo utilizado por aerolineas internacionales para rutas de larga distancia. Desde entonces, ha sido adoptado por numerosas companias aereas alrededor del mundo, convirtiendose en uno de los aviones preferidos para vuelos intercontinentales.</p>
+          <p>Entre sus principales logros, el A350 destaca por su capacidad para reducir el consumo de combustible en aproximadamente un 25% en comparacion con modelos anteriores, lo que tambien disminuye las emisiones contaminantes y el impacto ambiental. Ademas, es conocido por ser uno de los aviones mas silenciosos, tanto en el interior de la cabina como en el exterior, lo que mejora la experiencia de los pasajeros y reduce la contaminacion acustica en los aeropuertos.</p>
+          <p>Otro aspecto importante es la comodidad que ofrece. El A350 cuenta con una cabina mas amplia, mejor presion de aire y niveles de humedad mas altos, lo que ayuda a reducir la fatiga en vuelos largos. Tambien incluye iluminacion LED inteligente que simula los ciclos del dia, ayudando a los pasajeros a adaptarse mejor a los cambios de horario.</p>
+          <p>A lo largo de su historia, el A350 ha demostrado ser un simbolo de innovacion en la industria aeronautica, marcando un antes y un despues en la forma en que se disenan los aviones comerciales. Su combinacion de tecnologia, eficiencia y confort lo posiciona como uno de los modelos mas importantes del siglo XXI.</p>
+          <p>En la actualidad, el Airbus A350 continua evolucionando, con mejoras constantes en sus sistemas y nuevas versiones que buscan hacerlo aun mas eficiente. Gracias a todo esto, se mantiene como una de las mejores opciones para vuelos de larga distancia en todo el mundo.</p>
+          <div class="history-highlight">
+            <span>Momento destacado</span>
+            <h3>Primer vuelo oficial con una aerolinea</h3>
+            <p>La entrada en operacion comercial del Airbus A350 marco un momento historico para la aviacion moderna, al demostrar que el modelo estaba listo para transportar pasajeros en rutas reales de larga distancia.</p>
+            <img src="https://i0.wp.com/worldairlinenews.com/wp-content/uploads/2015/01/qatar-a350-900-inaugural-pushback-from-doha-1-15-15-qatarlr.jpg?resize=600%2C253&ssl=1" alt="Primer vuelo oficial del Airbus A350 con una aerolinea">
+          </div>
+          <h3>Hitos resumidos</h3>
+          <ul>
+            <li>Inicio del desarrollo en los anos 2000.</li>
+            <li>Rediseno completo como A350 XWB.</li>
+            <li>Primer vuelo en 2013.</li>
+            <li>Entrada en servicio en 2015.</li>
+            <li>Reduccion de hasta 25% en consumo de combustible.</li>
+            <li>Uso masivo de fibra de carbono.</li>
+            <li>Alta adopcion por aerolineas internacionales.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Carlos Angel Alexandro Martinez Arellano | 12/03/26</p>
+    </footer>
+  </div>
+
+  <script>
+    function showSection(id, button) {
+      document.querySelectorAll("section").forEach(function(section) {
+        section.classList.remove("active");
+      });
+
+      document.querySelectorAll(".nav-link").forEach(function(navButton) {
+        navButton.classList.remove("active-nav");
+      });
+
+      document.getElementById(id).classList.add("active");
+
+      if (button) {
+        button.classList.add("active-nav");
+      } else {
+        var currentButton = document.querySelector('.nav-link[data-section="' + id + '"]');
+        if (currentButton) {
+          currentButton.classList.add("active-nav");
+        }
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("light");
+    }
+  </script>
+</body>
+</html>
